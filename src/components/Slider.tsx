@@ -33,39 +33,30 @@ const Slider: FC<SliderProps> = ({ children, config }) => {
 
   const moveToTheNextSlide = () => {
     const currentSlideElement = trackRef.current?.children[currentSlide];
+    const firstItemInCurrentSlide = currentSlideElement?.children[0];
 
-    if (currentSlideElement instanceof HTMLElement) {
-      const firstItemInCurrentSlide = currentSlideElement.children[0];
+    const itemWidth = (firstItemInCurrentSlide as HTMLElement)?.offsetWidth + (config?.gap || 0);
 
-      if (firstItemInCurrentSlide instanceof HTMLElement) {
-        const itemWidth = firstItemInCurrentSlide.offsetWidth + (config?.gap || 0);
+    if (currentSlide < slides.length && itemWidth) {
+      setCurrentSlide(currentSlide + 1);
 
-        if (currentSlide < slides.length) {
-          setCurrentSlide(currentSlide + 1);
-
-          if (trackRef.current) {
-            trackRef.current.style.transform = `translateX(-${itemWidth * (currentSlide + 1)}px)`;
-          }
-        }
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateX(-${itemWidth * (currentSlide + 1)}px)`;
       }
     }
   };
 
   const moveToThePrevSlide = () => {
-    const firstSlide = trackRef.current?.firstChild;
-    const firstChildOfFirstSlide = firstSlide?.firstChild;
+    const firstSlideElement = trackRef.current?.firstChild;
+    const firstChildOfFirstSlide = firstSlideElement?.firstChild;
 
-    if (firstChildOfFirstSlide instanceof HTMLElement) {
-      const firstChildWidth = firstChildOfFirstSlide.offsetWidth + (config?.gap || 0);
+    const itemWidth = (firstChildOfFirstSlide as HTMLElement)?.offsetWidth + (config?.gap || 0);
 
-      if (currentSlide > 0) {
-        setCurrentSlide(currentSlide - 1);
+    if (currentSlide > 0 && itemWidth) {
+      setCurrentSlide(currentSlide - 1);
 
-        if (trackRef.current) {
-          trackRef.current.style.transform = `translateX(-${
-            firstChildWidth * (currentSlide - 1)
-          }px)`;
-        }
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateX(-${itemWidth * (currentSlide - 1)}px)`;
       }
     }
   };
