@@ -1,16 +1,6 @@
 import { Children, FC, ReactNode, useEffect, useRef, useState } from 'react';
 import styles from './Slider.module.css';
 
-function splitAnArrayByChunks<T>(array: T[], chunkSize: number): T[][] {
-  const chunks: T[][] = [];
-  const arrayCopy = [...array];
-
-  while (arrayCopy.length) {
-    chunks.push(arrayCopy.splice(0, chunkSize));
-  }
-  return chunks;
-}
-
 type SliderProps = {
   children: ReactNode;
   config?: {
@@ -20,114 +10,53 @@ type SliderProps = {
 };
 
 const Slider: FC<SliderProps> = ({ children, config }) => {
+  const slidesContainerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const slideContainerRef = useRef<HTMLDivElement>(null);
 
+  const [trackWidth, setTrackWidth] = useState(0);
+  const [slideWidth, setSlideWidth] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState<ReactNode[]>([]);
-
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
-  const [dragStart, setDragStart] = useState(0);
-  const [dragEnd, setDragEnd] = useState(0);
 
   const moveToTheNextSlide = () => {
-    const currentSlideElement = trackRef.current?.children[currentSlide];
-    const firstItemInCurrentSlide = currentSlideElement?.children[0];
-
-    const itemWidth = (firstItemInCurrentSlide as HTMLElement)?.offsetWidth + (config?.gap || 0);
-
-    if (currentSlide < slides.length && itemWidth) {
-      setCurrentSlide(currentSlide + 1);
-
-      if (trackRef.current) {
-        trackRef.current.style.transform = `translateX(-${itemWidth * (currentSlide + 1)}px)`;
+    if (trackRef.current && config?.slidesToShow) {
+      if (currentSlide < Children.count(children) - config.slidesToShow) {
+        trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide + 1)}px)`;
+        setCurrentSlide(currentSlide + 1);
       }
     }
   };
 
   const moveToThePrevSlide = () => {
-    const firstSlideElement = trackRef.current?.firstChild;
-    const firstChildOfFirstSlide = firstSlideElement?.firstChild;
-
-    const itemWidth = (firstChildOfFirstSlide as HTMLElement)?.offsetWidth + (config?.gap || 0);
-
-    if (currentSlide > 0 && itemWidth) {
-      setCurrentSlide(currentSlide - 1);
-
-      if (trackRef.current) {
-        trackRef.current.style.transform = `translateX(-${itemWidth * (currentSlide - 1)}px)`;
+    if (trackRef.current) {
+      if (currentSlide > 0) {
+        trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide - 1)}px)`;
+        setCurrentSlide(currentSlide - 1);
       }
     }
   };
 
-  // Touch events
-  const onTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
-  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
-  const onTouchEnd = () => {
-    if (touchStart - touchEnd > 150) {
-      moveToTheNextSlide();
-    }
-
-    if (touchStart - touchEnd < -150) {
-      moveToThePrevSlide();
-    }
-  };
-
-  // Drag and drop
-  const onDragStart = (e: React.DragEvent) => setDragStart(e.clientX);
-  const onDragOver = (e: React.DragEvent) => setDragEnd(e.clientX);
-  const onDragEnd = () => {
-    if (dragStart - dragEnd > 150) {
-      moveToTheNextSlide();
-    }
-
-    if (dragStart - dragEnd < -150) {
-      moveToThePrevSlide();
-    }
-  };
-
-  // Splitting children into slides by chunks
   useEffect(() => {
-    if (children) {
-      const slides = splitAnArrayByChunks(Children.toArray(children), config?.slidesToShow || 1);
-      setSlides(slides);
-    }
-  }, [children, config?.slidesToShow]);
+    if (slidesContainerRef.current) {
+      const slideWidth = slidesContainerRef.current.offsetWidth / (config?.slidesToShow || 1);
+      const trackWidth = slideWidth * Children.count(children);
 
-  const renderSlide = (slide: ReactNode, index: number): ReactNode => {
-    return (
-      <div
-        key={index}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${config?.slidesToShow || 1}, 1fr)`,
-          gap: `${config?.gap || 0}px`,
-          width: slideContainerRef.current ? `${slideContainerRef.current.clientWidth}px` : '100%',
-        }}
-      >
-        {slide}
-      </div>
-    );
-  };
+      setSlideWidth(slideWidth);
+      setTrackWidth(trackWidth);
+    }
+  }, [children, config?.gap, config?.slidesToShow]);
 
   return (
     <div className={styles.slider}>
-      <div ref={slideContainerRef} className={styles['slides-container']}>
+      <div ref={slidesContainerRef} className={styles['slides-container']}>
         <div
           ref={trackRef}
           className={styles['track']}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          onDragStart={onDragStart}
-          onDragOver={onDragOver}
-          onDragEnd={onDragEnd}
           style={{
             gap: `${config?.gap || 0}px`,
+            width: `${trackWidth}px`,
           }}
         >
-          {slides.map((slide, index) => renderSlide(slide, index))}
+          {children}
         </div>
       </div>
 
