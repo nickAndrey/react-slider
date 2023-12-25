@@ -21,20 +21,20 @@ const Slider: FC<SliderProps> = ({ children, config }) => {
   const [touchEnd, setTouchEnd] = useState(0);
 
   const moveToTheNextSlide = () => {
-    if (trackRef.current && config?.slidesToShow) {
-      if (currentSlide < Children.count(children) - config.slidesToShow) {
-        trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide + 1)}px)`;
-        setCurrentSlide(currentSlide + 1);
-      }
+    if (!trackRef.current) return;
+
+    if (currentSlide < Children.count(children) - (config?.slidesToShow || 1)) {
+      trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide + 1)}px)`;
+      setCurrentSlide(currentSlide + 1);
     }
   };
 
   const moveToThePrevSlide = () => {
-    if (trackRef.current) {
-      if (currentSlide > 0) {
-        trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide - 1)}px)`;
-        setCurrentSlide(currentSlide - 1);
-      }
+    if (!trackRef.current) return;
+
+    if (currentSlide > 0) {
+      trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide - 1)}px)`;
+      setCurrentSlide(currentSlide - 1);
     }
   };
 
