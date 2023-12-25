@@ -17,6 +17,9 @@ const Slider: FC<SliderProps> = ({ children, config }) => {
   const [slideWidth, setSlideWidth] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
   const moveToTheNextSlide = () => {
     if (trackRef.current && config?.slidesToShow) {
       if (currentSlide < Children.count(children) - config.slidesToShow) {
@@ -32,6 +35,18 @@ const Slider: FC<SliderProps> = ({ children, config }) => {
         trackRef.current.style.transform = `translateX(-${slideWidth * (currentSlide - 1)}px)`;
         setCurrentSlide(currentSlide - 1);
       }
+    }
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
+  const onTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
+  const onTouchEnd = () => {
+    if (touchStart - touchEnd > 150) {
+      moveToTheNextSlide();
+    }
+
+    if (touchStart - touchEnd < -150) {
+      moveToThePrevSlide();
     }
   };
 
@@ -51,6 +66,9 @@ const Slider: FC<SliderProps> = ({ children, config }) => {
         <div
           ref={trackRef}
           className={styles['track']}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
           style={{
             gap: `${config?.gap || 0}px`,
             width: `${trackWidth}px`,
