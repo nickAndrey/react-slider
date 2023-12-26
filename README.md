@@ -1,46 +1,35 @@
-# Getting Started with Create React App
+# Slider Component
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The `Slider` component is a customizable, responsive carousel/slider for your React application.
 
-## Available Scripts
+## Props
 
-In the project directory, you can run:
+- `children`: The slides you want to display in the carousel. This can be any valid React node.
+- `config`: An optional configuration object that can be used to customize the behavior of the carousel.
 
-### `npm start`
+## State Variables
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- `trackWidth`: The width of the track that the slides move along.
+- `slideWidth`: The width of each individual slide.
+- `currentSlide`: The index of the currently displayed slide.
+- `touchStart`: The x-coordinate of the point where the user started touching the screen (for touch devices).
+- `touchEnd`: The x-coordinate of the point where the user stopped touching the screen (for touch devices).
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Methods
 
-### `npm test`
+- `moveToTheNextSlide`: Moves the carousel to the next slide. If the carousel is already at the last slide, it will not move.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Usage
 
-### `npm run build`
+```tsx
+import Slider from './Slider';
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+<Slider config={{ slidesToShow: 3 }}>
+  <div>Slide 1</div>
+  <div>Slide 2</div>
+  <div>Slide 3</div>
+  {/* More slides... */}
+</Slider>;
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+In this example, the `Slider` component will display 3 slides at a time. You can customize this by changing the `slidesToShow` property in the `config` prop.
